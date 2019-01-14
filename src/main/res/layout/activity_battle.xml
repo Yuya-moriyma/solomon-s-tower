@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".activity.BattleActivity">
+
+    <LinearLayout
+        android:id="@+id/base"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <FrameLayout
+            android:id="@+id/area_skill_info"
+            android:layout_width="match_parent"
+            android:layout_height="28dp"
+            android:layout_marginHorizontal="24dp"
+            android:layout_marginVertical="5dp"/>
+
+        <FrameLayout
+            android:id="@+id/area_enemy_image"
+            android:layout_width="300dp"
+            android:layout_height="300dp"
+            android:layout_gravity="center">
+
+            <ImageView
+                android:id="@+id/enemy_image"
+                android:layout_width="300dp"
+                android:layout_height="300dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:srcCompat="@drawable/image_56" />
+
+            <ImageView
+                android:id="@+id/button_enemy_detail"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                app:srcCompat="@drawable/detail" />
+        </FrameLayout>
+
+        <FrameLayout
+            android:id="@+id/area_battle_info"
+            style="@style/text_normal"
+            android:layout_width="match_parent"
+            android:layout_height="24dp"
+            android:layout_margin="4dp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_margin="5dp"
+            android:orientation="horizontal"
+            android:background="@drawable/frame_transparent">
+
+            <TableLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="0.7"
+                android:layout_margin="5dp"
+                android:background="@drawable/frame_transparent">
+
+                <TableRow
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:layout_margin="5dp">
+
+                    <ImageView
+                        android:id="@+id/player_icon"
+                        android:layout_width="75dp"
+                        android:layout_height="75dp"
+                        android:layout_gravity="center"
+                        android:layout_margin="5dp"
+                        android:foreground="@drawable/frame_icon"
+                        app:srcCompat="@drawable/icon_72" />
+                </TableRow>
+
+                <TableRow
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:layout_marginHorizontal="5dp"
+                    android:layout_marginTop="-8dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="17dp"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:layout_marginLeft="5dp"
+                            android:text="HP"
+                            android:textColor="#ff0000"
+                            android:textSize="10dp" />
+
+                        <ProgressBar
+                            android:id="@+id/bar_player_hp"
+                            style="@style/Base.Widget.AppCompat.ProgressBar.Horizontal"
+                            android:layout_width="58dp"
+                            android:layout_height="wrap_content"
+                            android:max="100"
+                            android:progress="100" />
+                    </LinearLayout>
+                </TableRow>
+                <TableRow
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="5dp"
+                    android:gravity="center">
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textAlignment="center"
+                        android:text="攻↑防↑封"
+                        />
+
+                </TableRow>
+                <TableRow
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="5dp"
+                    android:gravity="center">
+
+                    <ImageView
+                        android:layout_width="84dp"
+                        android:layout_height="40dp"
+                        android:layout_gravity="center"
+                        android:src="@drawable/detail" />
+                </TableRow>
+            </TableLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="0.3"
+                android:orientation="vertical"
+                android:background="#00000000">
+                <TableRow
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:layout_marginVertical="5dp"
+                    android:layout_marginRight="5dp"
+                    android:background="@drawable/frame_transparent"
+                    android:layout_weight="0.8">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_marginLeft="5dp"
+                        android:text="アイテム使用: "/>
+                    <Spinner
+                        android:id="@+id/spinner_item_list"
+                        android:layout_marginRight="5dp"
+                        android:spinnerMode="dialog">
+                    </Spinner>
+                </TableRow>
+                <TableRow
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginTop="-5dp"
+                    android:layout_weight="0.2"
+                    android:background="#00000000">
+                    <TextView
+                        style="@style/button_battle_attack"
+                        android:layout_marginVertical="5dp"
+                        android:layout_marginRight="2.5dp"/>
+                    <TextView
+                        style="@style/button_battle_change"
+                        android:layout_marginVertical="5dp"
+                        android:layout_marginLeft="2.5dp"
+                        android:layout_marginRight="5dp"/>
+                </TableRow>
+            </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
+</android.support.constraint.ConstraintLayout>

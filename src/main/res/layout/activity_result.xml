@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".activity.ResultActivity">
+
+    <FrameLayout
+        android:id="@+id/base"
+        style="@style/layout_base">
+
+        <LinearLayout
+            style="@style/layout_base"
+            android:layout_gravity="center"
+            android:orientation="vertical">
+
+            <LinearLayout
+                style="@style/layout_base"
+                android:layout_gravity="center"
+                android:layout_weight="0.5"
+                android:orientation="vertical">
+
+                <TextView
+                    style="@style/text_normal"
+                    android:layout_marginVertical="5dp"
+                    android:text="バトル終了" />
+                <TextView
+                    style="@style/text_normal"
+                    android:layout_marginVertical="100dp"
+                    android:text="WIN"
+                    android:textSize="60sp"/>
+            </LinearLayout>
+
+            <LinearLayout
+                style="@style/layout_base"
+                android:layout_gravity="center"
+                android:layout_weight="0.5"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/button_back_home"
+                    style="@style/button_normal"
+                    android:layout_marginVertical="100dp"
+                    android:text="ホームに戻る" />
+            </LinearLayout>
+        </LinearLayout>
+    </FrameLayout>
+
+</android.support.constraint.ConstraintLayout>

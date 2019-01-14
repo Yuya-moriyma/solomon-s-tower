@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".activity.BattleReadyActivity">
+
+    <LinearLayout
+        android:id="@+id/base"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/current_floor"
+            style="@style/text_normal"
+            android:layout_marginTop="20dp" />
+
+        <TextView
+            android:id="@+id/next_enemy_info"
+            style="@style/text_normal"
+            android:layout_marginTop="20dp" />
+
+        <TextView
+            android:id="@+id/current_point"
+            style="@style/text_normal"
+            android:layout_marginTop="20dp" />
+
+        <TextView
+            android:id="@+id/button_move_battle"
+            style="@style/button_normal"
+            android:layout_marginTop="20dp"
+            android:text="@string/battle_start" />
+
+        <TextView
+            android:id="@+id/button_back_home"
+            style="@style/text_normal"
+            android:layout_marginTop="20dp" />
+    </LinearLayout>
+</android.support.constraint.ConstraintLayout>

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".activity.HomeActivity">
+
+    <LinearLayout
+        android:id="@+id/base"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <TextView
+            style="@style/button_normal"
+            android:id="@+id/home_title_message"
+            android:layout_marginTop="40dp"
+            android:text="@string/menu_head"
+            android:textSize="36sp" />
+
+        <TextView
+            style="@style/button_normal"
+            android:id="@+id/button_move_battle_ready"
+            android:layout_marginTop="32dp"
+            android:text="@string/menu_tower"
+            android:clickable="true"/>
+
+        <TextView
+            style="@style/button_normal"
+            android:layout_marginTop="32dp"
+            android:id="@+id/menu_list_news"
+            android:text="@string/menu_news"
+            android:clickable="true"/>
+
+        <TextView
+            style="@style/button_normal"
+            android:id="@+id/button_move_title"
+            android:layout_marginTop="32dp"
+            android:text="@string/menu_title"
+            android:clickable="true"/>
+
+    </LinearLayout>
+</android.support.constraint.ConstraintLayout>

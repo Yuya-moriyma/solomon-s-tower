@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">Solomon’s Tower</string>
+    <string name="menu_head">メニュー</string>
+    <string name="menu_title">タイトル</string>
+    <string name="menu_news">お知らせ</string>
+    <string name="menu_tower">ソロモンの塔へ</string>
+    <string name="battle_start">戦闘開始</string>
+    <string name="attack">攻撃</string>
+    <string name="change">交代</string>
+</resources>

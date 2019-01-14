@@ -1,0 +1,104 @@
+<resources>
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:background">@android:color/white</item>
+        <item name="android:textColor">@android:color/black</item>
+    </style>
+
+    <!--common-->
+    <style name="button_normal">
+        <item name="android:textAlignment">center</item>
+        <item name="android:textSize">18dp</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:fontFamily">@font/architects_daughter</item>
+        <item name="android:background">#00000000</item>
+        <item name="android:clickable">true</item>
+        <item name="android:onClick">onTransition</item>
+    </style>
+
+    <style name="text_normal">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_gravity">center</item>
+        <item name="android:background">#00000000</item>
+        <item name="android:textAlignment">center</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:fontFamily">@font/architects_daughter</item>
+    </style>
+
+    <style name="layout_transparent">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:background">#00000000</item>
+    </style>
+
+    <style name="layout_base">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:background">#00000000</item>
+    </style>
+
+    <!--title-->
+    <style name="text_title_app_name">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_gravity">center</item>
+        <item name="android:textAlignment">center</item>
+        <item name="android:textSize">42dp</item>
+        <item name="android:fontFamily">@font/architects_daughter</item>
+        <item name="android:background">#00000000</item>
+    </style>
+
+    <style name="button_title_transition">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_gravity">center</item>
+        <item name="android:background">#00000000</item>
+        <item name="android:textAlignment">center</item>
+        <item name="android:textSize">28dp</item>
+        <item name="android:fontFamily">@font/architects_daughter</item>
+        <item name="android:clickable">true</item>
+        <item name="android:onClick">onTransition</item>
+    </style>
+
+    <!--battle-->
+
+    <style name="button_battle_attack">
+        <item name="android:textAlignment">center</item>
+        <item name="android:textSize">18dp</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:layout_weight">0.5</item>
+        <item name="android:text">@string/attack</item>
+        <item name="android:fontFamily">@font/architects_daughter</item>
+        <item name="android:background">@drawable/attack_button</item>
+        <item name="android:gravity">center</item>
+        <item name="android:clickable">true</item>
+        <item name="android:onClick">attackAction</item>
+    </style>
+
+    <style name="button_battle_change">
+        <item name="android:textAlignment">center</item>
+        <item name="android:textSize">18dp</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:layout_weight">0.5</item>
+        <item name="android:text">@string/change</item>
+        <item name="android:fontFamily">@font/architects_daughter</item>
+        <item name="android:background">@drawable/change_button</item>
+        <item name="android:gravity">center</item>
+        <item name="android:clickable">true</item>
+        <item name="android:onClick">changeAction</item>
+    </style>
+
+    <style name="snackbar_skill_info" parent="Widget.Design.Snackbar">
+        <item name="android:background">@android:color/transparent</item>
+    </style>
+
+</resources>
