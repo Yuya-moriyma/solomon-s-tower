@@ -31,23 +31,23 @@ public class CharacterRegistry extends BaseRegistry {
         //TODO:idに一致するキャラクターのステータス情報を取得
         if (id == 72) {
             String[] status = {"アンドロマリウス", String.valueOf(id), "1", "20", "5", "72"};
-            return new CharacterModel(new StatusModel(status));
+            //return new CharacterModel(new StatusModel(status));
         }
         if (id == 71) {
             String[] status = {"ダンタリオン", String.valueOf(id), "2", "23", "8", "71"};
-            return new CharacterModel(new StatusModel(status));
+//            return new CharacterModel(new StatusModel(status));
         }
         if (id == 56) {
             String[] status = {"グレモリー", String.valueOf(id), "2", "46", "20", "56"};
-            return new CharacterModel(new StatusModel(status));
+//            return new CharacterModel(new StatusModel(status));
         }
         if (id == 30) {
             String[] status = {"ダンタリオン", String.valueOf(id), "2", "23", "8", "71"};
-            return new CharacterModel(new StatusModel(status));
+//            return new CharacterModel(new StatusModel(status));
         }
         //helper.testInsert(db);
         String[] status = {"enemy", String.valueOf(id), "0", "9", "9", "0"};
-        return new CharacterModel(new StatusModel(status));
+        return null;
     }
 
     /**

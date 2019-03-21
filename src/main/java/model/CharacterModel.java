@@ -1,10 +1,14 @@
 package model;
 
+import android.database.sqlite.SQLiteCursor;
+import android.database.sqlite.SQLiteDatabase;
+
 import java.util.*;
 
 import constant.Character;
 import constant.Status;
 import entity.ActionResult;
+import entity.CharacterEntity;
 
 public class CharacterModel {
 
@@ -15,36 +19,25 @@ public class CharacterModel {
 
     //endregion
 
-    //region コンストラクタ
-
-    /**
-     * コンストラクタ
-     *
-     * @param status
-     */
-    public CharacterModel(StatusModel status) {
-        this.status = status;
+    public CharacterEntity getCharacter(int id) {
+        return new CharacterEntity(findById(id));
     }
-    //endregion
+
+    private SQLiteCursor findById(int id) {
+        SQLiteCursor c = null;
+        try {
+            DbOpenHelper helper = new DbOpenHelper();
+            SQLiteDatabase db = helper.getReadableDatabase();
+            String sql = "select * from m_character where id = " + id + ";";
+            c = (SQLiteCursor) db.rawQuery(sql, null);
+            c.moveToFirst();
+        } catch (Exception e) {
+            Exception _e = e;
+        }
+        return c;
+    }
 
     //region メソッド
-
-    /**
-     * ダメージ計算処理
-     *
-     * @param damageValue
-     * @param result
-     */
-    public void damage(int damageValue, ActionResult result) {
-        int currentHp = this.getStatus(Character.STATUS_HP);
-        int damagedHp = currentHp - damageValue;
-        if (damagedHp <= 0) {
-            result.killed = true;
-            damagedHp = 0;
-        }
-        this.updateBattleStatus(Character.STATUS_HP, damagedHp);
-        result.damageValue = currentHp - damagedHp;
-    }
 
     /**
      * スキル封印
@@ -57,6 +50,7 @@ public class CharacterModel {
 
     /**
      * スキルカウント設定
+     *
      * @param turnCount
      */
     public void setSkillCount(String property, int turnCount) {
@@ -115,7 +109,7 @@ public class CharacterModel {
      * @return
      */
     public boolean isSkillActive() {
-        if(this.battleStatus.getSkillCounts().isEmpty()){
+        if (this.battleStatus.getSkillCounts().isEmpty()) {
             return true;
         }
         return true;

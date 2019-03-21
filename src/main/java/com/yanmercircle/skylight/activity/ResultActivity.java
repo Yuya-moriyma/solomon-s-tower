@@ -5,6 +5,8 @@ import android.os.Bundle;
 
 import com.yanmercircle.skylight.R;
 
+import entity.TransitionParam;
+
 public class ResultActivity extends BaseActivity {
 
     @Override
@@ -16,5 +18,10 @@ public class ResultActivity extends BaseActivity {
     private void init(){
         //描画内容取得
         //描画設定
+    }
+
+    @Override
+    public TransitionParam setParam() {
+        return null;
     }
 }

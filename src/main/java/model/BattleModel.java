@@ -1,52 +1,60 @@
 package model;
 
-public class BattleModel {
+import android.content.ContentValues;
+import android.database.sqlite.SQLiteCursor;
 
-    //region フィールド
-    private PartyModel userParty;
-    private CharacterModel enemy;
-    private CharacterModel currentUserCharacter;
-    private ItemModel useItem;
-    //endregion
+import constant.Database;
+import entity.CharacterEntity;
+import util.LogUtil;
 
-    //region コンストラクタ
-    public BattleModel(PartyModel userParty, CharacterModel enemy) {
-        this.setUserParty(userParty);
-        this.setEnemy(enemy);
-    }
-    //endregion
+public class BattleModel extends BaseModel {
 
-    //region メソッド
-    public void ready() {
-        userParty.ready();
-        this.enemy.createBattleStatus();
-        this.currentUserCharacter = userParty.getFirstCharacter();
-    }
-    //endregion
-
-    //region アクセサー
-    public PartyModel getUserParty() {
-        return userParty;
+    public BattleModel() {
+        this.tableName = Database.TABLE_NAME_BATTLE;
+        DbOpenHelper helper = new DbOpenHelper();
+        db = helper.getReadableDatabase();
     }
 
-    public void setUserParty(PartyModel userParty) {
-        this.userParty = userParty;
+    public void registerCharacter(CharacterEntity entity, boolean playable) {
+        ContentValues cv = new ContentValues();
+        cv.put("playable", playable ? 1 : 0);
+        cv.put("id", entity.getInt("id"));
+        cv.put("type", entity.getInt("type"));
+        cv.put("atk", entity.getInt("atk"));
+        cv.put("hp", entity.getInt("hp"));
+        cv.put("sealed", 0);
+        db.insert(tableName, null, cv);
     }
 
-    public CharacterModel getEnemy() {
-        return enemy;
+    public void clear() {
+        db.delete(tableName, null, null);
     }
 
-    public void setEnemy(CharacterModel enemy) {
-        this.enemy = enemy;
+    public int getStatus(boolean playable, String key) {
+        SQLiteCursor c = getRecord(playable);
+        return c.getInt(c.getColumnIndex(key));
     }
 
-    public CharacterModel getCurrentUserCharacter() {
-        return currentUserCharacter;
+    public CharacterEntity getCharacter(boolean playable) {
+        return new CharacterEntity(getRecord(playable));
     }
 
-    public void setUseItem(ItemModel useItem) {
-        this.useItem = useItem;
+    public void updateStatus(boolean playable, String key, int value) {
+        ContentValues cv2 = new ContentValues();
+        cv2.put(key, value);
+        db.update(tableName, cv2, "playable = " + (playable ? 1 : 0), null);
     }
-    //endregion
+
+    private SQLiteCursor getRecord(boolean playable) {
+        SQLiteCursor c = null;
+        try {
+            String sql = "select * from " + tableName + " where playable = " + (playable ? 1 : 0) + ";";
+            LogUtil.out(sql);
+            c = (SQLiteCursor) db.rawQuery(sql, null);
+            c.moveToFirst();
+        } catch (Exception e) {
+            Exception _e = e;
+        }
+        return c;
+    }
 }

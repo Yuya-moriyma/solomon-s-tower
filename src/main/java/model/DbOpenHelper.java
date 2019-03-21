@@ -2,40 +2,41 @@ package model;
 
 
 import android.content.ContentValues;
+import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+
+import com.yanmercircle.skylight.R;
+
 import constant.Database;
+import util.builder.QueryBuilder;
 
 import static java.sql.Types.NULL;
 
 public class DbOpenHelper extends SQLiteOpenHelper {
 
-    //region コンストラクタ
+    private SQLiteDatabase db;
+
     public DbOpenHelper() {
         super(ApplicationModel.getInstance(), Database.DB_NAME, null, Database.DB_VERSION);
     }
-    //endregion
 
-    //region メソッド
     @Override
     public void onCreate(SQLiteDatabase db) {
-        //全テーブル初期化
-        db.execSQL(Database.CREATE_TABLE_CHARACTER_SQL);
+        this.db = db;
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         db.execSQL("DROP TABLE IF EXISTS " + Database.TABLE_NAME_CHARACTER + ";");
-        onCreate(db);
-        testCharacterInsert(db);
+        init();
     }
-    public void testInsert(SQLiteDatabase db) {
-        testCharacterInsert(db);
+
+    public void init() {
+
     }
-    public void insert(SQLiteDatabase db, String tableName, ContentValues cv){
-        db.insert(tableName, null, cv);
-    }
-    public void testCharacterInsert(SQLiteDatabase db) {
+
+    public void insert() {
         ContentValues cv = new ContentValues();
         cv.put("id", 0);
         cv.put("name", "テスト");
@@ -45,6 +46,5 @@ public class DbOpenHelper extends SQLiteOpenHelper {
         cv.put("skill", 9);
         db.insert(Database.TABLE_NAME_CHARACTER, null, cv);
     }
-    //endregion
 }
 

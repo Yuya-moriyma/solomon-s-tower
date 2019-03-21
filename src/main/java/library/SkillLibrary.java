@@ -2,27 +2,51 @@ package library;
 
 import constant.Battle;
 import constant.Character;
+import constant.Skill;
 import constant.Status;
 import entity.ActionResult;
+import entity.CharacterEntity;
+import model.BattleModel;
 import model.CharacterModel;
 import util.MathUtil;
+
+import static constant.Battle.CHARACTER_PLAYABLE_FLG;
 
 public class SkillLibrary {
 
     //region メソッド
 
+    public ActionResult activateSkill(
+            CharacterEntity offense,
+            CharacterEntity defense,
+            Skill.TIMING timing
+    ) {
+        switch (offense.getInt("id")) {
+            case 72:
+                return getSkillResult72(offense, timing);
+            case 71:
+                return getSkillResult71(defense, timing);
+        }
+        return null;
+    }
+
     /**
      * スキル番号72
      *
-     * @param offence
-     * @param defence
-     * @return
+     * @return ActionResult
      */
-    public ActionResult getSkillResult72(CharacterModel offence, CharacterModel defence) {
+    public ActionResult getSkillResult72(CharacterEntity offense, Skill.TIMING timing) {
+        if (timing != Skill.TIMING.Attack) {
+            return new ActionResult();
+        }
         ActionResult result = new ActionResult();
-        int atk = offence.getBattleStatus(Character.STATUS_ATK);
-        offence.updateBattleStatus(Character.STATUS_ATK, atk * 2);
-        offence.setSkillCount(Character.STATUS_ATK, 1);
+        offense.putValue("atk", offense.getInt("atk") * 2);
+        BattleModel battle = new BattleModel();
+        battle.updateStatus(
+                offense.getInt("playable") == CHARACTER_PLAYABLE_FLG,
+                "atk",
+                offense.getInt("atk")
+        );
         result.skillName = "邪悪な炎";
         result.battleInfo = "攻撃力が増加した！";
         result.effectType.add(Battle.EFFECT_TYPE.UP);
@@ -32,17 +56,28 @@ public class SkillLibrary {
     /**
      * スキル番号71
      *
-     * @param defence
+     * @param defense
      * @return
      */
-    public ActionResult getSkillResult71(CharacterModel defence) {
+    public ActionResult getSkillResult71(CharacterEntity defense, Skill.TIMING timing) {
+        if (timing != Skill.TIMING.Attack) {
+            return new ActionResult();
+        }
         ActionResult result = new ActionResult();
         if (!awakable(25)) {
+            result.skillName = "死のメッセージ";
+            result.battleInfo = "発動失敗";
             return result;
         }
-        defence.damage(defence.getBattleStatus(Character.STATUS_ATK), result);
+        defense.putValue("hp", defense.getInt("hp") - 10);
+        BattleModel battle = new BattleModel();
+        battle.updateStatus(
+                defense.getInt("playable") == CHARACTER_PLAYABLE_FLG,
+                "hp",
+                defense.getInt("hp")
+        );
         result.skillName = "死のメッセージ";
-        result.battleInfo = String.valueOf(result.damageValue) + "のダメージ！";
+        result.battleInfo = String.format("%dのダメージ！", 10);
         result.effectType.add(Battle.EFFECT_TYPE.DARK);
         return result;
     }

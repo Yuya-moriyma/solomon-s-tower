@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".fragment.BattleReadyFragment">
+
+    <FrameLayout style="@style/layout_base">
+
+        <ImageView
+            android:id="@+id/solomon_circle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:alpha="0.25"
+            android:src="@drawable/solomon" />
+
+        <LinearLayout
+            style="@style/layout_transparent"
+            android:layout_gravity="center"
+            android:layout_marginBottom="25dp"
+            android:orientation="vertical">
+
+            <TextView
+                style="@style/text_normal"
+                android:id="@+id/splash_floor_header"
+                android:layout_gravity="center"
+                android:fontFamily="@font/pigmo"
+                android:text="～　72階　～"
+                android:textSize="26dp" />
+
+            <TextView
+                style="@style/text_normal"
+                android:id="@+id/splash_floor_name"
+                android:layout_gravity="center"
+                android:fontFamily="@font/pigmo"
+                android:text="アンドロマリウス"
+                android:textSize="32dp" />
+        </LinearLayout>
+    </FrameLayout>
+
+</FrameLayout>

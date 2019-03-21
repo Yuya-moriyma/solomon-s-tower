@@ -14,9 +14,9 @@ public class BaseRegistry {
 
     //region コンストラクタ
     public BaseRegistry(String tableName) {
-//        this.helper = new DbOpenHelper();
-//        this.db = helper.getReadableDatabase();
-//        this.tableName = tableName;
-    }
+        this.helper = new DbOpenHelper();
+        this.db = helper.getReadableDatabase();
+        this.tableName = tableName;
+}
     //endregion
 }

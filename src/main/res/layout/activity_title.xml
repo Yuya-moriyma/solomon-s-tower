@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".activity.TitleActivity">
@@ -17,10 +17,7 @@
             android:layout_height="match_parent"
             android:layout_gravity="center"
             android:alpha="0.25"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/solomon" />
+            android:src="@drawable/solomon"/>
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -30,23 +27,28 @@
             android:orientation="vertical">
 
             <TextView
-                android:id="@+id/title_message"
                 style="@style/text_title_app_name"
+                android:id="@+id/title_message"
                 android:layout_marginVertical="60dp"
-                android:text="@string/app_name" />
-
-            <TextView
-                android:id="@+id/button_continue"
-                style="@style/button_title_transition"
-                android:layout_marginVertical="20dp"
-                android:text="Continue" />
+                android:alpha="0"
+                android:text="@string/app_name"
+                android:fontFamily="@font/pigmo"/>
 
             <TextView
                 android:id="@+id/button_new_game"
                 style="@style/button_title_transition"
                 android:layout_marginVertical="20dp"
+                android:alpha="0"
                 android:text="New Game" />
+
+            <TextView
+                android:id="@+id/button_continue"
+                style="@style/button_title_transition"
+                android:layout_marginVertical="20dp"
+                android:alpha="0"
+                android:text="Continue"/>
+
         </LinearLayout>
     </FrameLayout>
-</android.support.constraint.ConstraintLayout>
+</RelativeLayout>
 

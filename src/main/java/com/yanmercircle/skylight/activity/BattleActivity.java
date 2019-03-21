@@ -2,34 +2,33 @@ package com.yanmercircle.skylight.activity;
 
 import android.animation.Animator;
 import android.animation.AnimatorSet;
-import android.content.Intent;
+import android.animation.ObjectAnimator;
 import android.os.Bundle;
-import android.view.Gravity;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.FrameLayout;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
+import android.view.animation.AnimationSet;
+import android.view.animation.CycleInterpolator;
+import android.view.animation.TranslateAnimation;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
-import android.widget.TextView;
 
 import com.yanmercircle.skylight.R;
-
-import constant.Battle;
-import constant.Character;
-import constant.Skill;
-import entity.ActionResult;
-import entity.ButtonItem;
+import com.yanmercircle.skylight.fragment.BaseFragment;
+import com.yanmercircle.skylight.fragment.BattleReadyFragment;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
+import java.util.List;
 
+import constant.Battle;
+import entity.ActionResult;
+import entity.CharacterEntity;
+import entity.TransitionParam;
 import service.BattleService;
 import service.CharacterService;
 import service.UserService;
-import util.AnimUtil;
-import util.StringUtil;
+
+import static constant.Character.*;
 
 public class BattleActivity extends BaseActivity {
 
@@ -38,185 +37,75 @@ public class BattleActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_battle);
-        this.init();
     }
 
-    /**
-     * 初期化処理
-     */
-    private void init() {
-        //データ取得
-        Intent intent = getIntent();
-        String id = intent.getStringExtra("0");
-        //バトル準備
+    @Override
+    protected void onResume() {
+        super.onResume();
+        UserService userService = new UserService();
+        int userCharacterId = userService.getFirstCharacter();
+        int enemyId = userService.getNextEnemyId();
+        CharacterService characterService = new CharacterService();
+//        CharacterEntity character = characterService.findById(userCharacterId);
+//        CharacterEntity enemy = characterService.findById(enemyId);
+        CharacterEntity player = characterService.findById(72);
+        CharacterEntity enemy = characterService.findById(71);
         BattleService battle = new BattleService();
-        battle.init(Integer.parseInt(id));
-        //自キャラクター表示設定
-        setPlayerView();
-        //敵キャラクター表示設定
-        setEnemyView();
-        //アイテム設定
-        UserService user = new UserService();
-        ArrayList itemList = user.getItemList();
-        setSpinner(R.id.spinner_item_list, itemList, new AdapterView.OnItemSelectedListener() {
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                ButtonItem item = (ButtonItem) parent.getSelectedItem();
-                BattleService battle = new BattleService();
-                battle.setUseItem(item.index);
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-                BattleService battle = new BattleService();
-                battle.setUseItem(Battle.SELECTED_ITEM_INDEX_DEFAULT);
-            }
-        });
-        readyBattle();
+        battle.init(player, enemy);
+        initView();
+        TransitionParam param = new TransitionParam();
+        param.put("floor", nextFloor).put("name", enemy.getString("name"));
+        BaseFragment fragment = BattleReadyFragment.newInstance(param);
+        showFragment(R.id.dialog, fragment, BATTLE_READY_FRAGMENT_TAG);
     }
 
-    /**
-     * 戦闘開始準備
-     */
-    public void readyBattle() {
+    @Override
+    public TransitionParam setParam() {
+        return null;
+    }
+    //endregion
+
+    public void onAttack(View view) {
         BattleService battle = new BattleService();
-        ActionResult result = battle.activateSkill(true, Skill.TIMING.BattleStart);
-        setPlayerView(result);
-        setEnemyView();
-        result = battle.activateSkill(false, Skill.TIMING.BattleStart);
-        setEnemyView(result);
-        setPlayerView();
+        ArrayList<ActionResult> result = battle.actionTurn();
+        setCharacterView();
+        //選択中のアイテム取得
+        //アイテム効果発動
+        //味方攻撃時スキル発動
+        //敵防御時スキル発動
+        //攻撃処理
+        //アニメーション
+        ImageView imageView = findViewById(R.id.enemy_image);
+        AlphaAnimation anim = new AlphaAnimation( 1, 0 );
+        anim.setDuration(50);
+        anim.setRepeatMode(Animation.REVERSE);
+        anim.setRepeatCount(6);
+        imageView.startAnimation(anim);
     }
 
-    /**
-     * 自キャラクター表示設定(追加情報あり)
-     */
-    private void setPlayerView(ActionResult result) {
-        setPlayerView();
-        if (result == null) {
-            return;
-        }
+    public void onChange(View view) {
+
     }
 
-    /**
-     * 敵キャラクター表示設定(追加情報あり)
-     */
-    private void setEnemyView(ActionResult result) {
-        setEnemyView();
-        if (result == null) {
-            return;
-        }
-    }
-
-
-    /**
-     * 自キャラクター表示設定
-     */
-    private void setPlayerView() {
-        CharacterService character = new CharacterService();
-        HashMap<String, String> statusViewData = character.getFirstCharacterStatus();
-        int iconId = character.getIconId(Integer.parseInt(statusViewData.get(Character.STATUS_ID)));
-        ProgressBar hp = findViewById(R.id.bar_player_hp);
-        hp.setMax(Integer.valueOf(statusViewData.get(Character.STATUS_HP_MAX)));
-        hp.setProgress(Integer.valueOf(statusViewData.get(Character.STATUS_HP)));
-        ImageView imageView = findViewById(R.id.player_icon);
-        imageView.setImageResource(iconId);
-    }
-
-    /**
-     * 敵キャラクター表示設定
-     */
-    private void setEnemyView() {
-        CharacterService character = new CharacterService();
-        HashMap<String, String> statusViewData = character.getEnemyCharacterStatus();
-        int imageId = character.getImageId(
-                Integer.parseInt(statusViewData.get(Character.STATUS_ID)));
-        ImageView enemyImage = findViewById(R.id.enemy_image);
-        enemyImage.setImageResource(imageId);
-    }
-
-    /**
-     * 攻撃アクション
-     *
-     * @param view
-     */
-    public void attackAction(View view) {
+    private void initView() {
         BattleService battle = new BattleService();
-        ArrayList<ActionResult> list = new ArrayList();
-        //ターン開始
-        list.add(battle.activateItem());
-        list.add(battle.activateSkill(true, Skill.TIMING.TurnStart));
-        list.add(battle.activateSkill(false, Skill.TIMING.TurnStart));
-        //プレイヤー攻撃
-        list.add(battle.activateSkill(true, Skill.TIMING.Attack));
-        list.add(battle.activateSkill(false, Skill.TIMING.Defence));
-        list.add(battle.attack(true));
-        //敵攻撃
-        list.add(battle.activateSkill(true, Skill.TIMING.Defence));
-        list.add(battle.attack(false));
-        list.add(battle.activateSkill(false, Skill.TIMING.Attack));
-        list.removeAll(Collections.singleton(null));
-        startAnimationSequential(list);
+        CharacterEntity player = battle.getStatus(true);
+        CharacterEntity enemy = battle.getStatus(false);
+        ProgressBar playerHp = findViewById(R.id.bar_enemy_hp);
+        playerHp.setMax(player.getInt("hp"));
+        ProgressBar enemyHp = findViewById(R.id.bar_player_hp);
+        enemyHp.setMax(enemy.getInt("hp"));
+        changeImage(R.id.enemy_image, IMAGE_ID_LIST.get(enemy.getInt("id")));
+        changeImage(R.id.player_icon, ICON_ID_LIST.get(player.getInt("id")));
     }
 
-    /**
-     * アクション結果描画
-     *
-     * @param list
-     */
-    private void startAnimationSequential(ArrayList<ActionResult> list) {
-        FrameLayout enemyImageArea = findViewById(R.id.area_enemy_image);
-        ImageView enemyDetailButton = findViewById(R.id.button_enemy_detail);
-        ArrayList<Animator> animList = new ArrayList();
-        animList.add(AnimUtil.fadeOut(enemyDetailButton));
-        for (ActionResult result : list) {
-            if(StringUtil.isNullOrEmpty(result.skillName)){
-                readySkillAnim(result, (FrameLayout)findViewById(R.id.area_skill_info), animList);
-            }
-            if(StringUtil.isNullOrEmpty(result.battleInfo)){
-                readyBattleInfoAnim(result, (FrameLayout)findViewById(R.id.area_battle_info), animList);
-            }
-        }
-        AnimatorSet animSequence = new AnimatorSet();
-        animSequence.playSequentially(animList);
-        animSequence.start();
+    private void setCharacterView() {
+        BattleService battle = new BattleService();
+        CharacterEntity player = battle.getStatus(true);
+        CharacterEntity enemy = battle.getStatus(false);
+        ProgressBar playerHp = findViewById(R.id.bar_enemy_hp);
+        playerHp.setProgress(player.getInt("hp"));
+        ProgressBar enemyHp = findViewById(R.id.bar_player_hp);
+        enemyHp.setProgress(enemy.getInt("hp"));
     }
-
-    /**
-     * スキルアニメーション設定
-     * @param result
-     * @param skillInfoArea
-     * @param animList
-     * @return
-     */
-    public void readySkillAnim(ActionResult result, FrameLayout skillInfoArea, ArrayList<Animator> animList){
-        TextView view = new TextView(this);
-        if(result.isPlayer){
-            view.setBackground(getDrawable(R.drawable.frame_skill_info_player));
-        }else {
-            view.setBackground(getDrawable(R.drawable.frame_skill_info_enemy));
-        }
-        view.setText(result.skillName);
-        view.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
-        FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        lp.gravity = Gravity.CENTER;
-        view.setLayoutParams(lp);
-        view.setAlpha(0);
-        skillInfoArea.addView(view);
-        animList.addAll(AnimUtil.popup(view));
-    }
-
-    public void readyBattleInfoAnim(ActionResult result, FrameLayout battleInfoArea, ArrayList<Animator> animList) {
-        TextView view = new TextView(this);
-        view.setBackground(getDrawable(R.drawable.frame_transparent));
-        view.setText(result.battleInfo);
-        view.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
-        FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        lp.gravity = Gravity.CENTER;
-        view.setLayoutParams(lp);
-        view.setAlpha(0);
-        battleInfoArea.addView(view);
-        animList.addAll(AnimUtil.popup(view));
-    }
-
-        //endregion
 }

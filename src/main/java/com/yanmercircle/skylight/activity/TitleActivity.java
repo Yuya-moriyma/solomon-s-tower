@@ -7,24 +7,44 @@ import android.widget.ImageView;
 
 import com.yanmercircle.skylight.R;
 
+import entity.TransitionParam;
+import service.UserService;
 import util.AnimUtil;
 
 public class TitleActivity extends BaseActivity {
 
-    //region メソッド
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_title);
-        this.init();
+        init();
+    }
+
+    @Override
+    protected void onResume() {
+        AnimUtil.rotate(findViewById(R.id.title_icon), true);
+        View[] views = {
+                findViewById(R.id.title_message),
+                findViewById(R.id.button_new_game),
+                findViewById(R.id.button_continue)
+        };
+        AnimUtil.fadeInAll(views, null);
+        super.onResume();
     }
 
     public void init() {
-        ImageView titleImage = findViewById(R.id.title_icon);
-        AnimUtil.rotate(titleImage, true);
+
     }
 
-    public void onTransition(View view){
+    public void onTransition(View view) {
+        if (view.getId() == R.id.button_new_game) {
+            UserService user = new UserService();
+            user.initDB();
+        }
         super.onTransition(view);
     }
-    //endregion
+
+    @Override
+    public TransitionParam setParam() {
+        return null;
+    }
 }

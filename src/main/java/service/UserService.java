@@ -1,272 +1,136 @@
 package service;
 
-import android.app.Application;
+import android.content.ContentValues;
+import android.database.sqlite.SQLiteDatabase;
 import android.text.TextUtils;
+import android.util.Log;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Arrays;
 import java.util.List;
-import registory.CharacterRegistry;
-import registory.ItemRegistry;
-import constant.Character;
-import entity.ButtonItem;
+
+import constant.Database;
+import entity.QueryContentValue;
 import model.*;
-import util.ArrayUtil;
-import util.LogUtil;
 import util.MathUtil;
-import util.StringUtil;
+import util.builder.QueryBuilder;
 
 public class UserService {
 
     //region メソッド
 
     /**
-     * ユーザーデータ取得
-     * @return
+     * DB初期化
      */
-    public UserModel getUser() {
-        PartyModel party = null;
-        List itemList = null;
-        TowerModel tower = null;
-        int currentFloor = 0;
-        int currentPoint = 0;
-        List knownEnemyIds = null;
+    public void initDB() {
         try {
-            HashMap<String, String> userData = this.getData();
-            party = this.createParty(userData.get("party"));
-            itemList = this.createItem(userData.get("item"));
-            currentFloor = Integer.parseInt(userData.get("floor"));
-            currentPoint = Integer.parseInt(userData.get("point"));
-            tower = this.createTower(userData.get("floorConstruct"));
-            knownEnemyIds = this.createKnownEnemyIds(userData.get("knownEnemyIds"));
-        } catch (RuntimeException e) {
-            LogUtil.printStackTrace(e);
+            DbOpenHelper helper = new DbOpenHelper();
+            SQLiteDatabase db = helper.getWritableDatabase();
+            //全テーブル初期化
+            db.execSQL("DROP TABLE IF EXISTS " + Database.TABLE_NAME_CHARACTER + ";");
+            db.execSQL("DROP TABLE IF EXISTS " + Database.TABLE_NAME_USER + ";");
+            db.execSQL("DROP TABLE IF EXISTS " + Database.TABLE_NAME_BATTLE + ";");
+            db.execSQL("DROP TABLE IF EXISTS " + Database.TABLE_NAME_SKILL_TIMER + ";");
+            QueryBuilder builder = new QueryBuilder();
+            builder.put("id", Database.Type.INTEGER);
+            builder.put("name", Database.Type.TEXT);
+            builder.put("type", Database.Type.INTEGER);
+            builder.put("hp", Database.Type.INTEGER);
+            builder.put("atk", Database.Type.INTEGER);
+            builder.put("skill_detail", Database.Type.INTEGER);
+            db.execSQL(builder.build(Database.TABLE_NAME_CHARACTER));
+            builder.clear();
+            builder.put("name", Database.Type.TEXT);
+            builder.put("party", Database.Type.TEXT);
+            builder.put("floor_point", Database.Type.INTEGER);
+            builder.put("current_floor", Database.Type.INTEGER);
+            builder.put("current_structure", Database.Type.TEXT);
+            builder.put("achievement", Database.Type.TEXT);
+            builder.put("known_enemys", Database.Type.TEXT);
+            db.execSQL(builder.build(Database.TABLE_NAME_USER));
+            builder.clear();
+            builder.put("playable", Database.Type.INTEGER);
+            builder.put("id", Database.Type.INTEGER);
+            builder.put("type", Database.Type.INTEGER);
+            builder.put("atk", Database.Type.INTEGER);
+            builder.put("hp", Database.Type.INTEGER);
+            builder.put("sealed", Database.Type.INTEGER);
+            db.execSQL(builder.build(Database.TABLE_NAME_BATTLE));
+            builder.clear();
+            builder.put("skill_id", Database.Type.INTEGER);
+            builder.put("turn", Database.Type.INTEGER);
+            db.execSQL(builder.build(Database.TABLE_NAME_SKILL_TIMER));
+//            int firstCharacter = MathUtil.getRandomValue(MathUtil.getRandomList(63, 10));
+            int firstCharacter = 71;
+            String structure = createFloorConstruct(firstCharacter);
+            ContentValues cv = new ContentValues();
+            cv.put("name", "テスト");
+            cv.put("party", String.valueOf(firstCharacter));
+            cv.put("floor_point", 0);
+            cv.put("current_floor", 71);
+            cv.put("current_structure", structure);
+            cv.put("achievement", "");
+            cv.put("known_enemys", structure);
+            db.insert(Database.TABLE_NAME_USER, null, cv);
+            for (QueryContentValue value : Database.ddl) {
+                db.insert(Database.TABLE_NAME_CHARACTER, null, value.generate());
+            }
+//            ContentValues cv2 = new ContentValues();
+//            cv2.put("name", "テスト２");
+//            db.update(Database.TABLE_NAME_USER, cv2, "", null);
+        } catch (Exception e) {
+            Exception _e = e;
+            Log.e("error", e.getMessage());
         }
-        return new UserModel(party, currentFloor, currentPoint, itemList, tower, knownEnemyIds);
     }
 
-    /**
-     * 敵のIDを覚えているかチェック
-     * @param enemyId
-     * @return
-     */
-    public boolean rememberEnemy(int enemyId) {
-        boolean result = false;
-        try {
-            ApplicationModel app = ApplicationModel.getInstance();
-            UserModel model = app.getUser();
-            List knownEnemyId = model.getKnownEnemyId();
-            result = knownEnemyId.contains(enemyId);;
-        }
-        catch (RuntimeException e) {
-            LogUtil.printStackTrace(e);
-            return result;
-        }
-        return false;
+    public int getNextFloor(){
+        UserModel user = new UserModel();
+        return user.getIntData("current_floor")-1;
     }
 
-    /**
-     * 現在の階層を取得する
-     * @return
-     */
-    public int getCurrentFloor() {
-        int result = 0;
-        try {
-            ApplicationModel app = ApplicationModel.getInstance();
-            UserModel model = app.getUser();
-            result = model.getCurrentFloor();
+    public int getNextEnemyId(){
+        UserModel user = new UserModel();
+        int currentFloor = user.getIntData("current_floor")-1;
+        String currentStructure = user.getStringData("current_structure");
+        List<String> knownEnemys = Arrays.asList(user.getStringData("known_enemys").split(","));
+        String[] _currentStructure = currentStructure.split(",");
+        String nextEnemyId = _currentStructure[70-currentFloor];
+        if(!knownEnemys.contains(nextEnemyId)){
+            nextEnemyId = "0";
         }
-        catch (RuntimeException e) {
-            LogUtil.printStackTrace(e);
-            return result;
-        }
-        return result;
+        return Integer.valueOf(nextEnemyId);
     }
 
-    /**
-     * 現在の序列ポイントを取得する
-     * @return
-     */
-    public int getCurrentPoint() {
-        int result = 0;
-        try {
-            ApplicationModel app = ApplicationModel.getInstance();
-            UserModel model = app.getUser();
-            result = model.getCurrentPoint();
-        }
-        catch (RuntimeException e) {
-            LogUtil.printStackTrace(e);
-            return result;
-        }
-        return result;
-    }
-
-    /**
-     * 現在の序列ポイントを取得する
-     * @return
-     */
-    public TowerModel getTower() {
-        TowerModel result = null;
-        try {
-            ApplicationModel app = ApplicationModel.getInstance();
-            UserModel model = app.getUser();
-            result = model.getTower();
-        }
-        catch (RuntimeException e) {
-            LogUtil.printStackTrace(e);
-            return result;
-        }
-        return result;
-    }
-
-    /**
-     * パーティ作成
-     * @param partyIds
-     * @return
-     */
-    private PartyModel createParty(String partyIds) {
-        CharacterRegistry registry = new CharacterRegistry();
-        List characters = new ArrayList<CharacterModel>();
-        String[] ids = partyIds.split(",");
-        for(String id : ids) {
-            characters.add(registry.createCharacter(Integer.parseInt(id)));
-        }
-        return new PartyModel(characters);
-    }
-
-    /**
-     * アイテム生成
-     * @param itemIds
-     * @return
-     */
-    private List<ItemModel> createItem(String itemIds) {
-        ItemRegistry registry = new ItemRegistry();
-        List list = new ArrayList<ItemModel>();
-        String[] ids = itemIds.split(",");
-        for(String id : ids) {
-            list.add(registry.getItem(id));
-        }
-        return list;
-    }
-
-    /**
-     * タワーモデル作成
-     * @param floorConstruct
-     * @return
-     */
-    private TowerModel createTower(String floorConstruct) {
-        CharacterRegistry registry = new CharacterRegistry();
-        List<CharacterModel> floorCharacters = registry.createCharacters(
-                ArrayUtil.convertToTextBlock(floorConstruct));
-        return new TowerModel(floorCharacters);
-    }
-
-    /**
-     * 敵情報作成
-     * @param enemyIds
-     * @return
-     */
-    private List<Integer> createKnownEnemyIds(String enemyIds) {
-        List list = new ArrayList<Integer>();
-        String[] ids = enemyIds.split(",");
-        for(String id : ids) {
-            list.add(String.valueOf(id));
-        }
-        return list;
-    }
-
-
-    /**
-     * ユーザーデータを読み込み
-     * @return
-     */
-    private HashMap getData() {
-        HashMap data = this.loadData();
-        if(data != null) {
-            return data;
-        }
-        return this.createNewData();
-    }
-
-    /**
-     * ユーザーデータをDBから取得
-     * @return
-     */
-    private HashMap loadData() {
-        //TODO:DBからユーザーデータ取得
-        CharacterRegistry registry = new CharacterRegistry();
-        CharacterModel model = registry.createCharacter(72);
-        int id = model.getStatus(Character.STATUS_ID);
-        HashMap<String, String> newData = new HashMap<String, String>();
-        newData.put("party", String.valueOf(id));
-        newData.put("floor", "1");
-        newData.put("point", "10");
-        newData.put("item", "1,2,3");
-        newData.put("floorConstruct", this.createFloorConstruct(id));
-        newData.put("knownEnemyIds", "56,72,30");
-        return newData;
-    }
-
-
-    /**
-     * ユーザーデータを新規作成
-     * @return
-     */
-    private HashMap createNewData() {
-        int firstCharacter = MathUtil.getRandomValue(MathUtil.getRandomList(63,10));
-        HashMap<String, String> newData = new HashMap<String, String>();
-        newData.put("party", String.valueOf(firstCharacter));
-        newData.put("floor", "1");
-        newData.put("point", "0");
-        newData.put("item", "2,1,3");
-        newData.put("floorConstruct", this.createFloorConstruct(firstCharacter));
-        newData.put("knownEnemyIds", "50,72,30");
-        return newData;
+    public int getFirstCharacter(){
+        UserModel user = new UserModel();
+        String party = user.getStringData("party");
+        return Integer.valueOf(party.split(",")[0]);
     }
 
     /**
      * 階数作成
+     *
      * @return
      */
     private String createFloorConstruct(int firstCharacter) {
         ArrayList<Integer> list = new ArrayList(72);
-        list.addAll(MathUtil.getRandomList(63,10));
+        list.addAll(MathUtil.getRandomList(63, 10));
         list.add(7);
-        list.addAll(MathUtil.getRandomList(53,10));
+        list.addAll(MathUtil.getRandomList(53, 10));
         list.add(6);
-        list.addAll(MathUtil.getRandomList(44,9));
+        list.addAll(MathUtil.getRandomList(44, 9));
         list.add(5);
-        list.addAll(MathUtil.getRandomList(35,9));
+        list.addAll(MathUtil.getRandomList(35, 9));
         list.add(4);
-        list.addAll(MathUtil.getRandomList(26,9));
+        list.addAll(MathUtil.getRandomList(26, 9));
         list.add(3);
-        list.addAll(MathUtil.getRandomList(17,9));
+        list.addAll(MathUtil.getRandomList(17, 9));
         list.add(2);
-        list.addAll(MathUtil.getRandomList(8,9));
+        list.addAll(MathUtil.getRandomList(8, 9));
         list.add(1);
         list.remove(list.indexOf(firstCharacter));
         list.remove(list.indexOf(55));
-        return TextUtils.join(",",list);
+        return TextUtils.join(",", list);
     }
-
-    /**
-     * アイテムリスト取得
-     * @return
-     */
-    public ArrayList<ButtonItem> getItemList() {
-        try {
-            ArrayList<ButtonItem>  itemList = new ArrayList<ButtonItem>();
-            UserModel user = ApplicationModel.getUser();
-            List<ItemModel> list = user.getItemList();
-            int index = 0;
-            for(ItemModel item : list) {
-                itemList.add(new ButtonItem(index++, item.getName()));
-            }
-            return itemList;
-        } catch (RuntimeException e) {
-            LogUtil.printStackTrace(e);
-            return null;
-        }
-    }
-    //endregion
 }

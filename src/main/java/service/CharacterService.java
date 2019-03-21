@@ -1,20 +1,27 @@
 package service;
 
+import android.database.sqlite.SQLiteCursor;
+
 import com.yanmercircle.skylight.R;
 
 import java.util.HashMap;
 
+import entity.CharacterEntity;
 import registory.CharacterRegistry;
 import constant.Character;
 import model.ApplicationModel;
 import model.BattleModel;
 import model.CharacterModel;
-import model.UserModel;
 import util.LogUtil;
 
 public class CharacterService {
 
     //region メソッド
+
+    public CharacterEntity findById(int id){
+        CharacterModel character = new CharacterModel();
+        return character.getCharacter(id);
+    }
 
     /**
      * キャラクター名取得
@@ -32,37 +39,6 @@ public class CharacterService {
             return "";
         }
     }
-
-    /**
-     * パーティの先頭のキャラクターステータスを取得
-     * @return
-     */
-    public HashMap<String, String> getFirstCharacterStatus() {
-        try {
-            UserModel user = ApplicationModel.getUser();
-            return getStatusViewData(user.getParty().getFirstCharacter());
-        }
-        catch (RuntimeException e) {
-            LogUtil.printStackTrace(e);
-            return null;
-        }
-    }
-
-    /**
-     * パーティの先頭のキャラクターステータスを取得
-     * @return
-     */
-    public HashMap<String, String> getEnemyCharacterStatus() {
-        try {
-            BattleModel battle = ApplicationModel.getBattle();
-            return getStatusViewData(battle.getEnemy());
-        }
-        catch (RuntimeException e) {
-            LogUtil.printStackTrace(e);
-            return null;
-        }
-    }
-
 
     /**
      * キャラクターアイコン名取得

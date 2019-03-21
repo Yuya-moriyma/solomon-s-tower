@@ -39,7 +39,7 @@ public class AnimUtil {
      *
      * @param image
      */
-    public static void rotate(ImageView image, boolean isInfinite) {
+    public static void rotate(View image, boolean isInfinite) {
         RotateAnimation anim = new RotateAnimation(0.0f, 360.0f,
                 Animation.RELATIVE_TO_SELF, 0.5f,
                 Animation.RELATIVE_TO_SELF, 0.5f);
@@ -106,6 +106,25 @@ public class AnimUtil {
                 .setDuration(500)
                 .withEndAction(onCompleted)
                 .start();
+    }
+
+    /**
+     * 連続フェードイン
+     *
+     * @param views
+     */
+    public static void fadeInAll(View[] views, Runnable onCompleted) {
+        long delay = 0;
+        for (View view : views) {
+            view.animate()
+                    .alpha(1f)
+                    .setStartDelay(delay);
+            if (view == views[views.length-1] && onCompleted !=  null) {
+                view.animate().withEndAction(onCompleted);
+            }
+            view.animate().start();
+            delay += 150;
+        }
     }
 
     public static List<Animator> popup(View view) {

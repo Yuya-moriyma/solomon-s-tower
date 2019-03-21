@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".activity.BattleActivity">
@@ -17,7 +17,35 @@
             android:layout_width="match_parent"
             android:layout_height="28dp"
             android:layout_marginHorizontal="24dp"
-            android:layout_marginVertical="5dp"/>
+            android:layout_marginTop="5dp" />
+
+        <LinearLayout
+            android:id="@+id/area_enemy_hp"
+            android:layout_width="300dp"
+            android:layout_height="28dp"
+            android:layout_gravity="center"
+            android:layout_marginHorizontal="24dp"
+            android:layout_marginVertical="5dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="30dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="left"
+                android:layout_marginLeft="5dp"
+                android:text="HP"
+                android:textColor="#ff0000"
+                android:textSize="20dp" />
+
+            <ProgressBar
+                android:id="@+id/bar_enemy_hp"
+                style="@style/Base.Widget.AppCompat.ProgressBar.Horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:max="100"
+                android:progress="100" />
+        </LinearLayout>
 
         <FrameLayout
             android:id="@+id/area_enemy_image"
@@ -29,16 +57,7 @@
                 android:id="@+id/enemy_image"
                 android:layout_width="300dp"
                 android:layout_height="300dp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:srcCompat="@drawable/image_56" />
-
-            <ImageView
-                android:id="@+id/button_enemy_detail"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                app:srcCompat="@drawable/detail" />
+                android:src="@drawable/image_56" />
         </FrameLayout>
 
         <FrameLayout
@@ -52,21 +71,21 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_margin="5dp"
-            android:orientation="horizontal"
-            android:background="@drawable/frame_transparent">
+            android:background="@drawable/frame_transparent"
+            android:orientation="horizontal">
 
             <TableLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_weight="0.7"
                 android:layout_margin="5dp"
+                android:layout_weight="0.7"
                 android:background="@drawable/frame_transparent">
 
                 <TableRow
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:layout_margin="5dp">
+                    android:layout_margin="5dp"
+                    android:gravity="center">
 
                     <ImageView
                         android:id="@+id/player_icon"
@@ -75,15 +94,15 @@
                         android:layout_gravity="center"
                         android:layout_margin="5dp"
                         android:foreground="@drawable/frame_icon"
-                        app:srcCompat="@drawable/icon_72" />
+                        android:src="@drawable/icon_72" />
                 </TableRow>
 
                 <TableRow
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:gravity="center"
                     android:layout_marginHorizontal="5dp"
-                    android:layout_marginTop="-8dp">
+                    android:layout_marginTop="-8dp"
+                    android:gravity="center">
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -108,73 +127,80 @@
                             android:progress="100" />
                     </LinearLayout>
                 </TableRow>
+
                 <TableRow
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginHorizontal="5dp"
                     android:gravity="center">
+
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:textAlignment="center"
+                        android:background="@drawable/background_transparent"
                         android:text="攻↑防↑封"
-                        />
+                        android:textSize="10dp"
+                        android:textAlignment="center"/>
 
                 </TableRow>
+
                 <TableRow
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_margin="5dp"
-                    android:gravity="center">
-
-                    <ImageView
-                        android:layout_width="84dp"
-                        android:layout_height="40dp"
-                        android:layout_gravity="center"
-                        android:src="@drawable/detail" />
-                </TableRow>
+                    android:gravity="center"></TableRow>
             </TableLayout>
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_weight="0.3"
-                android:orientation="vertical"
-                android:background="#00000000">
+                android:background="#00000000"
+                android:orientation="vertical">
+
                 <TableRow
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:gravity="center"
                     android:layout_marginVertical="5dp"
                     android:layout_marginRight="5dp"
+                    android:layout_weight="0.7"
                     android:background="@drawable/frame_transparent"
-                    android:layout_weight="0.8">
+                    android:gravity="center">
+
                     <TextView
                         android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
                         android:layout_marginLeft="5dp"
-                        android:text="アイテム使用: "/>
+                        android:text="アイテム使用: "
+                        android:textSize="10dp"/>
+
                     <Spinner
                         android:id="@+id/spinner_item_list"
                         android:layout_marginRight="5dp"
-                        android:spinnerMode="dialog">
-                    </Spinner>
+                        android:spinnerMode="dialog"></Spinner>
                 </TableRow>
+
                 <TableRow
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_marginTop="-5dp"
-                    android:layout_weight="0.2"
+                    android:layout_weight="0.3"
                     android:background="#00000000">
+
                     <TextView
                         style="@style/button_battle_attack"
                         android:layout_marginVertical="5dp"
-                        android:layout_marginRight="2.5dp"/>
+                        android:layout_marginRight="2.5dp"
+                        android:onClick="onAttack"/>
+
                     <TextView
                         style="@style/button_battle_change"
                         android:layout_marginVertical="5dp"
                         android:layout_marginLeft="2.5dp"
-                        android:layout_marginRight="5dp"/>
+                        android:layout_marginRight="5dp"
+                        android:onClick="onChange"/>
                 </TableRow>
             </LinearLayout>
         </LinearLayout>
     </LinearLayout>
-</android.support.constraint.ConstraintLayout>
+</RelativeLayout>

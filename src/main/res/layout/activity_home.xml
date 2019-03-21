@@ -1,43 +1,109 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".activity.HomeActivity">
 
-    <LinearLayout
+    <FrameLayout
         android:id="@+id/base"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:layout_height="match_parent">
 
-        <TextView
-            style="@style/button_normal"
-            android:id="@+id/home_title_message"
-            android:layout_marginTop="40dp"
-            android:text="@string/menu_head"
-            android:textSize="36sp" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
 
-        <TextView
-            style="@style/button_normal"
-            android:id="@+id/button_move_battle_ready"
-            android:layout_marginTop="32dp"
-            android:text="@string/menu_tower"
-            android:clickable="true"/>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:orientation="vertical">
 
-        <TextView
-            style="@style/button_normal"
-            android:layout_marginTop="32dp"
-            android:id="@+id/menu_list_news"
-            android:text="@string/menu_news"
-            android:clickable="true"/>
+                <LinearLayout
+                    android:id="@+id/home_header"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/frame_transparent"
+                    android:gravity="center"
+                    android:orientation="horizontal">
 
-        <TextView
-            style="@style/button_normal"
-            android:id="@+id/button_move_title"
-            android:layout_marginTop="32dp"
-            android:text="@string/menu_title"
-            android:clickable="true"/>
+                    <TextView
+                        style="@style/text_normal"
+                        android:layout_width="wrap_content"
+                        android:text="NEWS:"
+                        android:textSize="18dp" />
 
-    </LinearLayout>
-</android.support.constraint.ConstraintLayout>
+                    <TextView
+                        style="@style/text_normal"
+                        android:text="1.0リリース"
+                        android:textAlignment="textStart"
+                        android:textSize="18dp" />
+                </LinearLayout>
+
+                <ImageView
+                    android:id="@+id/home_image"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:scaleType="fitStart"
+                    android:src="@drawable/tower" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/home_title_message"
+                    style="@style/text_normal"
+                    android:layout_marginBottom="20dp"
+                    android:alpha="0"
+                    android:text="Menu"
+                    android:textSize="36dp" />
+
+                <TextView
+                    android:id="@+id/button_move_battle_ready"
+                    style="@style/text_normal"
+                    android:layout_marginVertical="10dp"
+                    android:alpha="0"
+                    android:onClick="showReadyDialog"
+                    android:text="Solomon's Tower"
+                    android:textSize="18dp" />
+
+                <TextView
+                    android:id="@+id/button_move_edit"
+                    style="@style/button_transition"
+                    android:layout_marginVertical="10dp"
+                    android:alpha="0"
+                    android:text="Edit"
+                    android:textSize="18dp" />
+
+                <TextView
+                    android:id="@+id/button_move_shop"
+                    style="@style/button_transition"
+                    android:layout_marginVertical="10dp"
+                    android:alpha="0"
+                    android:text="Shop"
+                    android:textSize="18dp" />
+
+                <TextView
+                    android:id="@+id/button_move_title"
+                    style="@style/button_transition"
+                    android:layout_marginVertical="10dp"
+                    android:alpha="0"
+                    android:text="Title"
+                    android:textSize="18dp" />
+
+            </LinearLayout>
+        </LinearLayout>
+
+        <FrameLayout
+            android:id="@+id/dialog"
+            style="@style/layout_base" />
+    </FrameLayout>
+
+</RelativeLayout>

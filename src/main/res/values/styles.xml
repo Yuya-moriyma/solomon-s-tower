@@ -11,25 +11,39 @@
     </style>
 
     <!--common-->
-    <style name="button_normal">
-        <item name="android:textAlignment">center</item>
-        <item name="android:textSize">18dp</item>
-        <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:fontFamily">@font/architects_daughter</item>
-        <item name="android:background">#00000000</item>
-        <item name="android:clickable">true</item>
-        <item name="android:onClick">onTransition</item>
-    </style>
-
     <style name="text_normal">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:layout_gravity">center</item>
-        <item name="android:background">#00000000</item>
-        <item name="android:textAlignment">center</item>
-        <item name="android:textSize">18sp</item>
-        <item name="android:fontFamily">@font/architects_daughter</item>
+        <item name="android:layout_marginRight">5dp</item>
+        <item name="android:layout_marginLeft">5dp</item>
+        <item name="android:layout_marginTop">5dp</item>
+        <item name="android:layout_marginBottom">3dp</item>
+        <item name="android:gravity">center</item>
+        <item name="android:background">@drawable/background_transparent</item>
+        <item name="android:fontFamily">@font/kaiso_next</item>
+    </style>
+
+    <style name="text_frame">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_margin">5dp</item>
+        <item name="android:gravity">center</item>
+        <item name="android:background">@drawable/background_transparent</item>
+    </style>
+
+    <style name="button_transition" parent="text_normal">
+        <item name="android:onClick">onTransition</item>
+    </style>
+
+    <style name="button_dialog_action" parent="text_normal">
+        <item name="android:layout_margin">10dp</item>
+        <item name="android:background">@drawable/frame_white</item>
+    </style>
+
+    <style name="button_dialog_close" parent="text_normal">
+        <item name="android:layout_margin">10dp</item>
+        <item name="android:background">@drawable/frame_white</item>
+        <item name="android:onClick">closeDialog</item>
     </style>
 
     <style name="layout_transparent">
@@ -51,7 +65,7 @@
         <item name="android:layout_gravity">center</item>
         <item name="android:textAlignment">center</item>
         <item name="android:textSize">42dp</item>
-        <item name="android:fontFamily">@font/architects_daughter</item>
+        <item name="android:fontFamily">@font/pigmo</item>
         <item name="android:background">#00000000</item>
     </style>
 
@@ -62,7 +76,7 @@
         <item name="android:background">#00000000</item>
         <item name="android:textAlignment">center</item>
         <item name="android:textSize">28dp</item>
-        <item name="android:fontFamily">@font/architects_daughter</item>
+        <item name="android:fontFamily">@font/kaiso_next</item>
         <item name="android:clickable">true</item>
         <item name="android:onClick">onTransition</item>
     </style>
@@ -100,5 +114,17 @@
     <style name="snackbar_skill_info" parent="Widget.Design.Snackbar">
         <item name="android:background">@android:color/transparent</item>
     </style>
+
+    <style name="AppTheme.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+        <item name="android:windowContentTransitions">true</item>
+        <item name="android:windowEnterTransition">@android:transition/fade</item>
+        <item name="android:windowExitTransition">@android:transition/fade</item>
+    </style>
+
+    <style name="AppTheme.AppBarOverlay" parent="Base.ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
 </resources>
