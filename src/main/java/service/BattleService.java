@@ -1,6 +1,6 @@
 package service;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 
 import constant.Battle;
 import entity.CharacterEntity;
@@ -11,8 +11,6 @@ import constant.Skill;
 import entity.ActionResult;
 import model.*;
 import util.MathUtil;
-
-import static constant.Battle.SKILL_SEALED_FLG;
 
 public class BattleService {
 
@@ -31,7 +29,7 @@ public class BattleService {
         battle.registerCharacter(enemy, false);
     }
 
-    public  CharacterEntity getStatus(boolean playable){
+    public CharacterEntity getStatus(boolean playable) {
         BattleModel battle = new BattleModel();
         return battle.getCharacter(playable);
     }
@@ -39,44 +37,56 @@ public class BattleService {
     /**
      * 攻撃実行(本処理)
      */
-    public ArrayList<ActionResult> actionTurn() {
-        ArrayList<ActionResult> list = new ArrayList<>();
+    public HashMap<String, ActionResult> actionTurn() {
+        HashMap<String, ActionResult> list = new HashMap();
         //前処理
         BattleModel battle = new BattleModel();
         CharacterEntity currentPlayerStatus = battle.getCharacter(true);
         CharacterEntity currentEnemyStatus = battle.getCharacter(false);
-        SkillLibrary lib = new SkillLibrary();
         //プレイヤー攻撃時スキル
-        if (currentPlayerStatus.getInt("sealed") != SKILL_SEALED_FLG) {
-            list.add(lib.activateSkill(currentPlayerStatus, currentEnemyStatus, Skill.TIMING.Attack));
-            if (currentEnemyStatus.getInt("hp") <= 0) {
-                list.get(list.size() - 1).finishBattle = true;
-                return list;
-            }
-        }
-        //プレイヤー攻撃
-        attack(true, currentPlayerStatus, currentEnemyStatus);
-        if (currentEnemyStatus.getInt("hp") <= 0) {
-            list.get(list.size() - 1).finishBattle = true;
+        activateSkill(list, currentPlayerStatus, currentEnemyStatus, Skill.Timing.PLAYER_ATTACK_SKILL, true);
+        if (canContinue()) {
             return list;
         }
-        if (currentEnemyStatus.getInt("sealed") != SKILL_SEALED_FLG) {
-            //敵攻撃時スキル
-            lib.activateSkill(currentEnemyStatus, currentPlayerStatus, Skill.TIMING.Attack);
-            if (currentPlayerStatus.getInt("hp") <= 0) {
-                list.get(list.size() - 1).finishBattle = true;
-                return list;
-            }
+        //プレイヤー攻撃
+        attack(list, currentPlayerStatus, currentEnemyStatus, true);
+        if (canContinue()) {
+            return list;
+        }
+        //敵攻撃時スキル
+        activateSkill(list, currentPlayerStatus, currentEnemyStatus, Skill.Timing.ENEMY_ATTACK_SKILL, false);
+        if (canContinue()) {
+            return list;
         }
         //敵攻撃
-        attack(false, currentPlayerStatus, currentEnemyStatus);
+
+        attack(list, currentPlayerStatus, currentEnemyStatus, false);
         if (currentPlayerStatus.getInt("hp") <= 0) {
             list.get(list.size() - 1).finishBattle = true;
         }
         return list;
     }
 
-    private void attack(boolean playable, CharacterEntity playerStatus, CharacterEntity enemyStatus) {
+    private void activateSkill(
+            HashMap<String, ActionResult> list,
+            CharacterEntity currentPlayerStatus,
+            CharacterEntity currentEnemyStatus,
+            Skill.Timing timing,
+            Boolean playable
+    ) {
+        SkillLibrary lib = new SkillLibrary();
+        ActionResult turnStartSkillResult = lib.activateSkill(
+                playable ? currentPlayerStatus : currentEnemyStatus,
+                playable ? currentEnemyStatus : currentPlayerStatus,
+                timing
+        );
+        if (turnStartSkillResult != null) {
+            list.put(timing.toString(), turnStartSkillResult);
+        }
+    }
+
+    private void attack(HashMap list, CharacterEntity playerStatus, CharacterEntity enemyStatus, boolean playable) {
+        ActionResult result = new ActionResult();
         BattleModel battle = new BattleModel();
         CharacterEntity offenseStatus = playable ? playerStatus : enemyStatus;
         CharacterEntity defenseStatus = playable ? enemyStatus : playerStatus;
@@ -87,7 +97,12 @@ public class BattleService {
         );
         int resultHp = defenseStatus.getInt("hp") - damage;
         defenseStatus.putValue("hp", resultHp);
-        battle.updateStatus(playable, "hp", resultHp);
+        battle.updateStatus(!playable, "hp", resultHp);
+        //攻撃結果出力
+        result.damageValue = damage;
+        result.effectType = Battle.convertTypeNum(offenseStatus.getInt("type"));
+        result.finishBattle = resultHp < 0;
+        list.put(playable ? "playerAttack" : "enemyAttack", result);
     }
 
     /**
@@ -142,6 +157,12 @@ public class BattleService {
     private boolean awakable(int probability) {
         int num = MathUtil.nextInt(100);
         return num < probability;
+    }
+
+    private boolean canContinue() {
+        CharacterEntity player = getStatus(true);
+        CharacterEntity enemy = getStatus(false);
+        return player.getInt("hp") <= 0 || enemy.getInt("hp") <= 0;
     }
     //endregion
 }

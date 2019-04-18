@@ -48,7 +48,7 @@ public abstract class BaseActivity extends AppCompatActivity {
             public void run() {
                 startActivity();
             }
-        });
+        },0);
     }
 
     /**
@@ -63,7 +63,7 @@ public abstract class BaseActivity extends AppCompatActivity {
             public void run() {
                 startActivity();
             }
-        });
+        },0);
     }
 
     /**
@@ -162,5 +162,17 @@ public abstract class BaseActivity extends AppCompatActivity {
         Spinner spinner = findViewById(id);
         spinner.setOnItemSelectedListener(listener);
         spinner.setAdapter(adapter);
+    }
+
+    protected boolean empty(int value){
+        return value == 0;
+    }
+
+    protected boolean empty(String value){
+        return value == null || value == "";
+    }
+
+    protected boolean empty(Object value){
+        return value == null;
     }
 }

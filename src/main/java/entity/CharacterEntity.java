@@ -52,4 +52,8 @@ public class CharacterEntity {
     public int getInt(String key) {
         return this.intValue.get(key);
     }
+
+    public Boolean isDied(){
+        return this.intValue.get("hp") <= 0;
+    }
 }

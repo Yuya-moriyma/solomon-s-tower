@@ -1,9 +1,6 @@
 package entity;
 
 import constant.Battle;
-import constant.Character;
-
-import java.util.ArrayList;
 
 public class ActionResult {
 
@@ -11,7 +8,7 @@ public class ActionResult {
     public boolean finishBattle;
     public int damageValue;
     public String skillName;
-    public ArrayList<Battle.EFFECT_TYPE> effectType;
+    public Battle.EFFECT_TYPE effectType;
     public String battleInfo;
     public CharacterEntity player;
     public CharacterEntity enemy;
@@ -22,7 +19,8 @@ public class ActionResult {
         this.damageValue = 0;
         this.skillName = "";
         this.battleInfo = "";
-        this.effectType = new ArrayList();
+        this.effectType = Battle.EFFECT_TYPE.NONE;
+        this.finishBattle = false;
     }
     //endregion
 }

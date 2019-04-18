@@ -1,24 +1,16 @@
 package com.yanmercircle.skylight.activity;
 
 import android.animation.Animator;
-import android.animation.AnimatorSet;
-import android.animation.ObjectAnimator;
 import android.os.Bundle;
 import android.view.View;
-import android.view.animation.AlphaAnimation;
-import android.view.animation.Animation;
-import android.view.animation.AnimationSet;
-import android.view.animation.CycleInterpolator;
-import android.view.animation.TranslateAnimation;
-import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.yanmercircle.skylight.R;
-import com.yanmercircle.skylight.fragment.BaseFragment;
-import com.yanmercircle.skylight.fragment.BattleReadyFragment;
+import com.yanmercircle.skylight.fragment.BattleSplashFragment;
 
 import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
 
 import constant.Battle;
 import entity.ActionResult;
@@ -27,6 +19,7 @@ import entity.TransitionParam;
 import service.BattleService;
 import service.CharacterService;
 import service.UserService;
+import util.AnimUtil;
 
 import static constant.Character.*;
 
@@ -53,10 +46,10 @@ public class BattleActivity extends BaseActivity {
         BattleService battle = new BattleService();
         battle.init(player, enemy);
         initView();
+        int nextFloor = userService.getNextFloor();
         TransitionParam param = new TransitionParam();
         param.put("floor", nextFloor).put("name", enemy.getString("name"));
-        BaseFragment fragment = BattleReadyFragment.newInstance(param);
-        showFragment(R.id.dialog, fragment, BATTLE_READY_FRAGMENT_TAG);
+        showFragment(R.id.dialog, BattleSplashFragment.newInstance(param), "");
     }
 
     @Override
@@ -67,20 +60,14 @@ public class BattleActivity extends BaseActivity {
 
     public void onAttack(View view) {
         BattleService battle = new BattleService();
-        ArrayList<ActionResult> result = battle.actionTurn();
-        setCharacterView();
+        HashMap resultList = battle.actionTurn();
         //選択中のアイテム取得
         //アイテム効果発動
         //味方攻撃時スキル発動
         //敵防御時スキル発動
         //攻撃処理
         //アニメーション
-        ImageView imageView = findViewById(R.id.enemy_image);
-        AlphaAnimation anim = new AlphaAnimation( 1, 0 );
-        anim.setDuration(50);
-        anim.setRepeatMode(Animation.REVERSE);
-        anim.setRepeatCount(6);
-        imageView.startAnimation(anim);
+        animateAttack(resultList);
     }
 
     public void onChange(View view) {
@@ -99,13 +86,141 @@ public class BattleActivity extends BaseActivity {
         changeImage(R.id.player_icon, ICON_ID_LIST.get(player.getInt("id")));
     }
 
-    private void setCharacterView() {
+    private void animateAttack(HashMap<String, ActionResult> list) {
+        ActionResult playerAttackSkill = list.get("playerAttackSkill");
+        ActionResult enemyAttackSkill = list.get("enemyAttackSkill");
+        ActionResult playerAttack = list.get("playerAttack");
+        ActionResult enemyAttack = list.get("enemyAttack");
+        ArrayList<Animator> animatorList = new ArrayList<>();
+        //味方攻撃時スキル
+        animatorList.addAll(createAttackSkillAnimator(playerAttackSkill, true));
+        //終了判定
+        if (playerAttackSkill.finishBattle) {
+            //TODO:バトル終了アニメーション
+            animatorList.add(AnimUtil.createDamageFlash(findViewById(R.id.enemy_image), new Runnable() {
+                @Override
+                public void run() {
+                    setCharacterView(false);
+                }
+            }));
+            AnimUtil.permutationExecute(animatorList);
+            return;
+        }
+        //味方攻撃
+        animatorList.addAll(createAttackAnimator(playerAttack, true));
+        if (playerAttack.finishBattle) {
+            //TODO:バトル終了アニメーション
+            AnimUtil.permutationExecute(animatorList);
+            return;
+        }
+        //敵攻撃時スキル
+        animatorList.addAll(createAttackSkillAnimator(enemyAttackSkill, false));
+        //終了判定
+        if (enemyAttackSkill.finishBattle) {
+            //TODO:バトル終了アニメーション
+            AnimUtil.permutationExecute(animatorList);
+            return;
+        }
+        //敵攻撃
+        animatorList.addAll(createAttackAnimator(enemyAttack, false));
+        if (enemyAttack.finishBattle) {
+            //TODO:バトル終了アニメーション
+            AnimUtil.permutationExecute(animatorList);
+            return;
+        }
+        AnimUtil.permutationExecute(animatorList);
+    }
+
+    private ArrayList<Animator> createAttackAnimator(ActionResult result, boolean playable) {
+        ArrayList<Animator> animatorList = new ArrayList<>();
+        final ActionResult _result = result;
+        final boolean _playable = playable;
+        animatorList.add(
+                AnimUtil.createFadeIn(findViewById(R.id.area_skill_name), new Runnable() {
+                    @Override
+                    public void run() {
+                        TextView textView = findViewById(R.id.text_skill_name);
+                        textView.setText("攻撃");
+                    }
+                })
+        );
+        if (_result.effectType != Battle.EFFECT_TYPE.NONE) {
+            animatorList.add(
+                    AnimUtil.createColorEffect(
+                            findViewById(R.id.effect),
+                            _result.effectType.getColor(),
+                            null
+                    )
+            );
+        }
+        animatorList.add(
+                AnimUtil.createDamageFlash(findViewById(_playable ? R.id.enemy_image : R.id.player_icon), new Runnable() {
+                    @Override
+                    public void run() {
+                        setCharacterView(!_playable);
+                    }
+                })
+        );
+        return animatorList;
+    }
+
+    private ArrayList<Animator> createAttackSkillAnimator(ActionResult result, boolean playable) {
+        ArrayList<Animator> animatorList = new ArrayList<>();
+        final ActionResult _result = result;
+        final boolean _playable = playable;
+        animatorList.add(
+                AnimUtil.createFadeIn(findViewById(R.id.area_skill_name), new Runnable() {
+                    @Override
+                    public void run() {
+                        TextView textView = findViewById(R.id.text_skill_name);
+                        textView.setText(_result.skillName);
+                    }
+                })
+        );
+        if (_result.effectType != Battle.EFFECT_TYPE.NONE) {
+            animatorList.add(
+                    AnimUtil.createColorEffect(
+                            findViewById(R.id.effect),
+                            _result.effectType.getColor(),
+                            null)
+            );
+        }
+        if (!empty(_result.damageValue)) {
+            animatorList.add(
+                    AnimUtil.createDamageFlash(findViewById(_playable ? R.id.enemy_image : R.id.player_icon), new Runnable() {
+                        @Override
+                        public void run() {
+                            setCharacterView(!_playable);
+                        }
+                    })
+            );
+        }
+        animatorList.add(
+                AnimUtil.createFadeIn(findViewById(R.id.area_battle_info), new Runnable() {
+                    @Override
+                    public void run() {
+                        TextView textView = findViewById(R.id.text_battle_info);
+                        textView.setText(_result.battleInfo);
+                    }
+                })
+        );
+        return animatorList;
+    }
+
+    private void setCharacterView(boolean playable) {
         BattleService battle = new BattleService();
-        CharacterEntity player = battle.getStatus(true);
+        if (playable) {
+            ProgressBar playerHp = findViewById(R.id.bar_player_hp);
+            CharacterEntity player = battle.getStatus(true);
+            playerHp.setProgress(player.getInt("hp"));
+            return;
+        }
+        ProgressBar enemyHp = findViewById(R.id.bar_enemy_hp);
         CharacterEntity enemy = battle.getStatus(false);
-        ProgressBar playerHp = findViewById(R.id.bar_enemy_hp);
-        playerHp.setProgress(player.getInt("hp"));
-        ProgressBar enemyHp = findViewById(R.id.bar_player_hp);
         enemyHp.setProgress(enemy.getInt("hp"));
+    }
+
+    private void finishBattle() {
+
     }
 }

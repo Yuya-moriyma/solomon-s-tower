@@ -17,6 +17,7 @@ import util.AnimUtil;
  */
 public class BattleSplashFragment extends BaseFragment {
 
+    private View view;
 
     public BattleSplashFragment() {
     }
@@ -33,20 +34,31 @@ public class BattleSplashFragment extends BaseFragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        TransitionParam param = (TransitionParam) getArguments().getSerializable("param");
-        return initView(inflater, container, param);
+        return initView(inflater, container);
     }
 
-    private View initView(LayoutInflater inflater, ViewGroup container, TransitionParam param) {
-        View view = inflater.inflate(R.layout.fragment_battle_splash, container, false);
+    @Override
+    public void onStart() {
+        super.onStart();
+        TransitionParam param = (TransitionParam) getArguments().getSerializable("param");
         AnimUtil.rotate(view.findViewById(R.id.solomon_circle), true);
         changeText(view, R.id.splash_floor_header, param.getInt("floor") + "階");
-        changeText(view, R.id.splash_floor_name, param.getString("enemy_name"));
+        changeText(view, R.id.splash_floor_name, param.getString("name"));
         View[] views = {
                 view.findViewById(R.id.splash_floor_header),
                 view.findViewById(R.id.splash_floor_name)
         };
         AnimUtil.fadeInAll(views, null);
+        view.findViewById(R.id.base)
+                .animate()
+                .alpha(0f)
+                .setDuration(500)
+                .setStartDelay(4000)
+                .start();
+    }
+
+    private View initView(LayoutInflater inflater, ViewGroup container) {
+        view = inflater.inflate(R.layout.fragment_battle_splash, container, false);
         return view;
     }
 

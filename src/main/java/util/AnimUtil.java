@@ -4,40 +4,25 @@ import android.animation.Animator;
 import android.animation.AnimatorSet;
 import android.animation.ArgbEvaluator;
 import android.animation.ObjectAnimator;
-import android.animation.TypeEvaluator;
 import android.animation.ValueAnimator;
-import android.app.Application;
-import android.content.Context;
-import android.content.res.Resources;
-import android.graphics.Color;
-import android.support.design.widget.Snackbar;
-import android.view.Gravity;
-import android.view.LayoutInflater;
+import android.graphics.drawable.ColorDrawable;
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.LinearInterpolator;
 import android.view.animation.RotateAnimation;
-import android.widget.ImageView;
-import android.widget.TextView;
-import android.widget.Toast;
 
-import com.yanmercircle.skylight.R;
-
-import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CountDownLatch;
 
-import entity.AsyncSleep;
-import model.ApplicationModel;
+import Listener.CallableListener;
+import constant.Battle;
 
 public class AnimUtil {
 
     /**
-     * 永続回転
+     * 回転
      *
      * @param image
+     * @param isInfinite
      */
     public static void rotate(View image, boolean isInfinite) {
         RotateAnimation anim = new RotateAnimation(0.0f, 360.0f,
@@ -58,52 +43,14 @@ public class AnimUtil {
      * フェードアウト
      *
      * @param view
+     * @param onCompleted
+     * @param delay
      */
-    public static void fadeOut(View view, Runnable onCompleted) {
+    public static void fadeOut(View view, Runnable onCompleted, int delay) {
         view.animate()
                 .alpha(0f)
                 .setDuration(500)
-                .withEndAction(onCompleted)
-                .start();
-    }
-
-    /**
-     * フェードアウト
-     *
-     * @param view
-     */
-    public static Animator fadeOut(View view) {
-        ObjectAnimator fadeOutAnimator = ObjectAnimator.ofFloat(view, "alpha", 1f, 0f);
-        fadeOutAnimator.setDuration(500);
-        return fadeOutAnimator;
-    }
-
-    /**
-     * フェードイン
-     *
-     * @param view
-     */
-    public static List<Animator> fadeIn(View view) {
-        ArrayList<Animator> list = new ArrayList();
-        ObjectAnimator fadeInAnimator = ObjectAnimator.ofFloat(view, "alpha", 0f, 1f);
-        fadeInAnimator.setDuration(500);
-        list.add(fadeInAnimator);
-        ObjectAnimator fadeOutAnimator = ObjectAnimator.ofFloat(view, "alpha", 1f, 1f);
-        fadeOutAnimator.setStartDelay(1000);
-        fadeOutAnimator.setDuration(500);
-        list.add(fadeOutAnimator);
-        return list;
-    }
-
-    /**
-     * フェードイン
-     *
-     * @param view
-     */
-    public static void fadeIn(View view, Runnable onCompleted) {
-        view.animate()
-                .alpha(1f)
-                .setDuration(500)
+                .setStartDelay(delay)
                 .withEndAction(onCompleted)
                 .start();
     }
@@ -119,7 +66,7 @@ public class AnimUtil {
             view.animate()
                     .alpha(1f)
                     .setStartDelay(delay);
-            if (view == views[views.length-1] && onCompleted !=  null) {
+            if (view == views[views.length - 1] && onCompleted != null) {
                 view.animate().withEndAction(onCompleted);
             }
             view.animate().start();
@@ -127,60 +74,80 @@ public class AnimUtil {
         }
     }
 
-    public static List<Animator> popup(View view) {
-        ArrayList<Animator> list = new ArrayList();
-        ObjectAnimator fadeInAnimator = ObjectAnimator.ofFloat(view, "alpha", 0f, 1f);
-        fadeInAnimator.setDuration(500);
-        list.add(fadeInAnimator);
-        ObjectAnimator fadeOutAnimator = ObjectAnimator.ofFloat(view, "alpha", 1f, 0f);
-        fadeOutAnimator.setStartDelay(1000);
-        fadeOutAnimator.setDuration(500);
-        list.add(fadeOutAnimator);
-        return list;
+    public static Animator createFadeIn(View view, Runnable callforward) {
+        ObjectAnimator objectAnimator = ObjectAnimator.ofFloat(view, "alpha", 0f, 1f).setDuration(750);
+        if(callforward != null){
+            objectAnimator.addListener(new CallableListener(callforward, null));
+        }
+        return objectAnimator;
     }
 
-    /**
-     * トースト
-     */
-    public static void toast(View view) {
-        AlphaAnimation anim = new AlphaAnimation(1, 0);
-        anim.setDuration(500);
-        anim.setFillAfter(true);
-        anim.setFillEnabled(true);
-        view.startAnimation(anim);
-
-        anim = new AlphaAnimation(0, 1);
-        anim.setDuration(500);
-        anim.setFillAfter(true);
-        anim.setFillEnabled(true);
-        anim.setStartTime(3000);
-        view.startAnimation(anim);
+    public static Animator createFadeOut(View view, Runnable callforward) {
+        ObjectAnimator objectAnimator = ObjectAnimator.ofFloat(view, "alpha", 1f, 0f).setDuration(750);
+        if(callforward != null){
+            objectAnimator.addListener(new CallableListener(callforward, null));
+        }
+        return objectAnimator;
     }
 
-    public static void testAnim(View view) {
-        ObjectAnimator objectAnimator = ObjectAnimator.ofObject(view, "Text", new TypeEvaluator() {
+    public static Animator createHidden(View view, Runnable callback) {
+        ObjectAnimator objectAnimator = ObjectAnimator.ofFloat(view, "alpha", 1f, 0f);
+        if(callback != null){
+            objectAnimator.addListener(new CallableListener(callback, null));
+        }
+        return objectAnimator;
+    }
+
+    public static Animator createShow(View view, Runnable callback) {
+        ObjectAnimator objectAnimator = ObjectAnimator.ofFloat(view, "alpha", 0f, 1f);
+        if(callback != null){
+            objectAnimator.addListener(new CallableListener(callback, null));
+        }
+        return objectAnimator;
+    }
+
+    public static Animator createColorEffect(View view, int color, Runnable callback) {
+        if(color == Battle.EFFECT_TYPE.NONE.getColor()){
+            return null;
+        }
+        final View _view = view;
+        int colorFrom = ((ColorDrawable) _view.getBackground()).getColor();
+        ValueAnimator colorAnimator = ValueAnimator.ofObject(new ArgbEvaluator(), colorFrom, color);
+        colorAnimator.setDuration(375);
+        colorAnimator.setRepeatCount(1);
+        colorAnimator.setRepeatMode(ValueAnimator.REVERSE);
+        colorAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
-            public Object evaluate(float fraction, Object startValue, Object endValue) {
-                return (fraction < 0.5) ? startValue : endValue;
+            public void onAnimationUpdate(ValueAnimator animator) {
+                _view.setBackgroundColor((int) animator.getAnimatedValue());
             }
-        }, "-", "--", "---");
-        objectAnimator.setRepeatCount(1);
-        objectAnimator.setDuration(3000);
-        objectAnimator.start();
+        });
+        if(callback != null){
+            colorAnimator.addListener(new CallableListener(null, callback));
+        }
+        return colorAnimator;
     }
 
-    /**
-     * スナックバー表示
-     *
-     * @param targetArea
-     */
-    public static void ShowSnackBar(View targetArea, String text) {
-        Snackbar snackbar = Snackbar.make(targetArea, text, Snackbar.LENGTH_SHORT);
-        snackbar.getView().setBackgroundColor(Color.RED);
-        TextView textView = snackbar.getView().findViewById(android.support.design.R.id.snackbar_text);
-        textView.setBackgroundColor(Color.RED);
-        textView.setTextColor(Color.BLACK);
-        snackbar.show();
+    public static Animator createDamageFlash(View view, Runnable callback) {
+        ObjectAnimator flashAnimator = ObjectAnimator.ofFloat(view, "alpha", 1f, 0f);
+        flashAnimator.setDuration(50);
+        flashAnimator.setRepeatMode(ValueAnimator.REVERSE);
+        flashAnimator.setRepeatCount(7);
+        flashAnimator.addListener(new CallableListener(null, callback));
+        return flashAnimator;
     }
 
+    public static void permutationExecute(List<Animator> animators) {
+        try {
+            AnimatorSet animatorSet = new AnimatorSet();
+            animatorSet.playSequentially(animators);
+            animatorSet.start();
+        } catch (Exception e){
+            Exception _e = e;
+        }
+    }
+
+    public void getEffectColor(){
+
+    }
 }

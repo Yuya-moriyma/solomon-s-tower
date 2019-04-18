@@ -1,7 +1,8 @@
 package library;
 
+import android.support.annotation.Nullable;
+
 import constant.Battle;
-import constant.Character;
 import constant.Skill;
 import constant.Status;
 import entity.ActionResult;
@@ -10,6 +11,7 @@ import model.BattleModel;
 import model.CharacterModel;
 import util.MathUtil;
 
+import static constant.Battle.CHARACTER_INVINCIBLE_FLG;
 import static constant.Battle.CHARACTER_PLAYABLE_FLG;
 
 public class SkillLibrary {
@@ -19,13 +21,15 @@ public class SkillLibrary {
     public ActionResult activateSkill(
             CharacterEntity offense,
             CharacterEntity defense,
-            Skill.TIMING timing
+            Skill.Timing timing
     ) {
         switch (offense.getInt("id")) {
             case 72:
                 return getSkillResult72(offense, timing);
             case 71:
-                return getSkillResult71(defense, timing);
+                return getSkillResult71(offense, defense, timing);
+            case 70:
+                return getSkillResult70(offense, timing);
         }
         return null;
     }
@@ -35,9 +39,13 @@ public class SkillLibrary {
      *
      * @return ActionResult
      */
-    public ActionResult getSkillResult72(CharacterEntity offense, Skill.TIMING timing) {
-        if (timing != Skill.TIMING.Attack) {
-            return new ActionResult();
+    @Nullable
+    private ActionResult getSkillResult72(CharacterEntity offense, Skill.Timing timing) {
+        if (!(timing == Skill.Timing.PLAYER_ATTACK_SKILL || timing == Skill.Timing.ENEMY_ATTACK_SKILL)) {
+            return null;
+        }
+        if (offense.getInt("sealed") == Battle.SKILL_SEALED_FLG) {
+            return null;
         }
         ActionResult result = new ActionResult();
         offense.putValue("atk", offense.getInt("atk") * 2);
@@ -47,9 +55,10 @@ public class SkillLibrary {
                 "atk",
                 offense.getInt("atk")
         );
+        //TODO:ターン制御データベース更新
         result.skillName = "邪悪な炎";
         result.battleInfo = "攻撃力が増加した！";
-        result.effectType.add(Battle.EFFECT_TYPE.UP);
+        result.effectType = Battle.EFFECT_TYPE.UP;
         return result;
     }
 
@@ -59,26 +68,56 @@ public class SkillLibrary {
      * @param defense
      * @return
      */
-    public ActionResult getSkillResult71(CharacterEntity defense, Skill.TIMING timing) {
-        if (timing != Skill.TIMING.Attack) {
-            return new ActionResult();
+    private ActionResult getSkillResult71(CharacterEntity offense, CharacterEntity defense, Skill.Timing timing) {
+        if (!(timing == Skill.Timing.PLAYER_ATTACK_SKILL || timing == Skill.Timing.ENEMY_ATTACK_SKILL)) {
+            return null;
+        }
+        if (offense.getInt("sealed") == Battle.SKILL_SEALED_FLG) {
+            return null;
         }
         ActionResult result = new ActionResult();
         if (!awakable(25)) {
             result.skillName = "死のメッセージ";
             result.battleInfo = "発動失敗";
+            result.effectType = Battle.EFFECT_TYPE.NONE;
             return result;
         }
-        defense.putValue("hp", defense.getInt("hp") - 10);
+        defense.putValue("atk", defense.getInt("atk") - 3);
         BattleModel battle = new BattleModel();
         battle.updateStatus(
                 defense.getInt("playable") == CHARACTER_PLAYABLE_FLG,
-                "hp",
-                defense.getInt("hp")
+                "atk",
+                defense.getInt("atk")
         );
         result.skillName = "死のメッセージ";
+        result.battleInfo = String.format("力を奪われる...", 3);
+        result.effectType = Battle.EFFECT_TYPE.DARK;
+        return result;
+    }
+
+    private ActionResult getSkillResult70(CharacterEntity offense, Skill.Timing timing) {
+        if (!(timing == Skill.Timing.PLAYER_DAMAGED_SKILL || timing == Skill.Timing.ENEMY_DAMAGED)) {
+            return null;
+        }
+        if (offense.getInt("sealed") == Battle.SKILL_SEALED_FLG) {
+            return null;
+        }
+        ActionResult result = new ActionResult();
+        if (!awakable(20)) {
+            result.skillName = "聖なる結界";
+            result.battleInfo = "発動失敗";
+            return result;
+        }
+        BattleModel battle = new BattleModel();
+        battle.updateStatus(
+                offense.getInt("playable") == CHARACTER_PLAYABLE_FLG,
+                "invincible",
+                CHARACTER_INVINCIBLE_FLG
+        );
+        //TODO:ターン制御データベース更新
+        result.skillName = "死のメッセージ";
         result.battleInfo = String.format("%dのダメージ！", 10);
-        result.effectType.add(Battle.EFFECT_TYPE.DARK);
+        result.effectType = Battle.EFFECT_TYPE.DARK;
         return result;
     }
 
@@ -95,7 +134,7 @@ public class SkillLibrary {
 //        }
         defence.setSkillCount(Status.STATUS_SKILL_AWAKABLE, 1);
         result.skillName = "霧の誘惑";
-        result.effectType.add(Battle.EFFECT_TYPE.SEALED);
+        result.effectType = Battle.EFFECT_TYPE.SEALED;
         result.battleInfo = defence.getName() + "はスキルが封印された！";
         return result;
     }

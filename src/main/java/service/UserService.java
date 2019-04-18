@@ -55,6 +55,7 @@ public class UserService {
             builder.put("atk", Database.Type.INTEGER);
             builder.put("hp", Database.Type.INTEGER);
             builder.put("sealed", Database.Type.INTEGER);
+            builder.put("invincible", Database.Type.INTEGER);
             db.execSQL(builder.build(Database.TABLE_NAME_BATTLE));
             builder.clear();
             builder.put("skill_id", Database.Type.INTEGER);
