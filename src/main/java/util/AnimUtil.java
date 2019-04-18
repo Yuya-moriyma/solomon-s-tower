@@ -13,8 +13,8 @@ import android.view.animation.RotateAnimation;
 
 import java.util.List;
 
-import Listener.CallableListener;
-import constant.Battle;
+import tower_of_solomon.Listener.CallableListener;
+import tower_of_solomon.constant.Battle;
 
 public class AnimUtil {
 

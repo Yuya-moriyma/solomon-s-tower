@@ -4,7 +4,7 @@ import android.text.TextUtils;
 
 import java.util.ArrayList;
 
-import constant.Database;
+import tower_of_solomon.constant.Database;
 
 public class QueryBuilder {
 

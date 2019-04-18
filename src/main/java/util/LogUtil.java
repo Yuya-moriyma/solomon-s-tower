@@ -1,11 +1,7 @@
 package util;
 
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
@@ -19,7 +15,7 @@ public class LogUtil {
         if(message == null || message == "") {
             return;
         }
-        Log.i(constant.Log.APP_ERROR_TAG, message);
+        Log.i(tower_of_solomon.constant.Log.APP_ERROR_TAG, message);
     }
 
     /**
@@ -34,7 +30,7 @@ public class LogUtil {
         if(stackTrace == null || stackTrace == "") {
             return;
         }
-        Log.i(constant.Log.APP_ERROR_TAG, stackTrace);
+        Log.i(tower_of_solomon.constant.Log.APP_ERROR_TAG, stackTrace);
     }
 
     public static void showErrorToast(RuntimeException e) {
